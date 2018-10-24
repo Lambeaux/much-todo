@@ -11,43 +11,40 @@
 
 <body>
     <div id="application">
-        <pre id="debug"></pre>
-        <div>
-            <input type="text" id="field">
-            <button id="submit">Add</button>
-            <button id="completeAll">Complete All</button>
-            <button id="filter">Filter: None</button>
-        </div>
-        <div>
+        <div id="header">
+            <h4>Much TODO (About Nothing)</h4>
             <div id="count"></div>
             <div id="incompleteCount"></div>
         </div>
-        <ul id="list">
+        <div id="control">
+            <input type="text" id="field">
+            <button id="submit">Add</button>
+            <button id="completeAll">Complete All</button>
+            <div>Filtering: </div>
+            <select id="filter">
+                <option value="NONE">None</option>
+                <option value="COMPLETE">Complete</option>
+                <option value="INCOMPLETE">Incomplete</option>
+            </select>
+        </div>
+        <ul class="todo-list" id="list">
+        </ul>
+
+        <hr />
+
+        <pre id="debug"></pre>
+        <h3>
+            Make an application with the following requirements:
+        </h3>
+        <ul>
+            <li>
+                Provide the ability to filter the list by completed or uncompleted
+            </li>
+            <li>
+                Implement routing that allows the user to go to those filters.
+            </li>
         </ul>
     </div>
-    <hr />
-    <h1>
-        Make an application with the following requirements:
-    </h1>
-    <ul>
-        <li>
-            Provide the ability to filter the list by completed or uncompleted
-        </li>
-        <li>
-            Implement routing that allows the user to go to those filters.
-        </li>
-    </ul>
-    <h1>
-        Go to the src directory and start editing index.html / index.js to get started.
-    </h1>
-    <h1 class="docs">
-        Check out the following sites for help:
-        <div><a href="https://www.w3schools.com/" target="_blank">w3schools</a></div>
-        <div><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference" target="_blank">MDN Web
-                Docs</a></div>
-        <div><a href="https://css-tricks.com/" target="_blank">CSS Tricks</a></div>
-        <div><a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/" target="_blank">Guide to Flexbox</a></div>
-    </h1>
 </body>
 
 </html>

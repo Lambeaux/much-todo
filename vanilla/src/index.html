@@ -6,57 +6,48 @@
     <title>
         <%= htmlWebpackPlugin.options.title %>
     </title>
+
 </head>
 
 <body>
     <div id="application">
-        <h1>
-            Make an application with the following requirements:
-        </h1>
-        <ul>
-            <li>
-                Maintain a list of todos
-            </li>
-            <li>
-                Todos consist of plain text
-            </li>
-            <li>
-                Allow users to add new todos to the list
-            </li>
-            <li>
-                Allow users to mark / unmark todos as complete
-            </li>
-            <li>
-                Allow users to mark / unmark all todos as complete in one action
-            </li>
-            <li>
-                Provide the ability to filter the list by completed or uncompleted
-            </li>
-            <li>
-                Implement routing that allows the user to go to those filters.
-            </li>
-            <li>
-                Allow users to delete todos
-            </li>
-            <li>
-                Indicate somewhere how many todos are uncompleted
-            </li>
-            <li>
-                Allow users to edit the text of an existing todo
-            </li>
+        <pre id="debug"></pre>
+        <div>
+            <input type="text" id="field">
+            <button id="submit">Add</button>
+            <button id="completeAll">Complete All</button>
+            <button id="filter">Filter: None</button>
+        </div>
+        <div>
+            <div id="count"></div>
+            <div id="incompleteCount"></div>
+        </div>
+        <ul id="list">
         </ul>
-        <h1>
-            Go to the src directory and start editing index.html / index.js to get started.
-        </h1>
-        <h1 class="docs">
-            Check out the following sites for help:
-            <div><a href="https://www.w3schools.com/" target="_blank">w3schools</a></div>
-            <div><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference" target="_blank">MDN Web
-                    Docs</a></div>
-            <div><a href="https://css-tricks.com/" target="_blank">CSS Tricks</a></div>
-            <div><a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/" target="_blank">Guide to Flexbox</a></div>
-        </h1>
     </div>
+    <hr />
+    <h1>
+        Make an application with the following requirements:
+    </h1>
+    <ul>
+        <li>
+            Provide the ability to filter the list by completed or uncompleted
+        </li>
+        <li>
+            Implement routing that allows the user to go to those filters.
+        </li>
+    </ul>
+    <h1>
+        Go to the src directory and start editing index.html / index.js to get started.
+    </h1>
+    <h1 class="docs">
+        Check out the following sites for help:
+        <div><a href="https://www.w3schools.com/" target="_blank">w3schools</a></div>
+        <div><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference" target="_blank">MDN Web
+                Docs</a></div>
+        <div><a href="https://css-tricks.com/" target="_blank">CSS Tricks</a></div>
+        <div><a href="https://css-tricks.com/snippets/css/a-guide-to-flexbox/" target="_blank">Guide to Flexbox</a></div>
+    </h1>
 </body>
 
 </html>

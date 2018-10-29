@@ -85,9 +85,14 @@ const TodoList = (function() {
       }
       draw();
     },
-    completeAll() {
+    markAll() {
       state.items.forEach(item => (item.isDone = true));
       state.itemCountIncompleteOnly = 0;
+      draw();
+    },
+    unmarkAll() {
+      state.items.forEach(item => (item.isDone = false));
+      state.itemCountIncompleteOnly = state.itemCount;
       draw();
     },
     endEdit(id, val) {
@@ -122,15 +127,19 @@ function init() {
       TodoList.setFilter("NONE");
     }
   };
-  onHashChange();
   window.addEventListener("hashchange", onHashChange, false);
+  onHashChange();
 
   const filterEl = document.getElementById("filter");
   filterEl.addEventListener("change", () => TodoList.setFilter(filterEl.value));
 
   document
-    .getElementById("completeAll")
-    .addEventListener("click", () => TodoList.completeAll());
+    .getElementById("markAll")
+    .addEventListener("click", () => TodoList.markAll());
+  document
+    .getElementById("unmarkAll")
+    .addEventListener("click", () => TodoList.unmarkAll());
+
   document.getElementById("submit").addEventListener("click", () => {
     const inputEl = document.getElementById("field");
     const text = inputEl.value;

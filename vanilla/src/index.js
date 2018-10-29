@@ -3,29 +3,48 @@ import "./index.css";
 // TODO - possibly try to separate the draw() calls from this model object
 // Look into calls to .bind() for a higher order function
 const TodoList = (function() {
-  var index = 0;
   const filters = {
     NONE: item => true,
     COMPLETE: item => item.isDone === true,
     INCOMPLETE: item => item.isDone === false
   };
-  const state = {
-    itemCount: 0,
-    itemCountIncompleteOnly: 0,
-    filter: "NONE",
-    items: []
+  const props = {
+    filter: "NONE"
   };
+  const local = localStorage.getItem("much-todo");
+  const state =
+    local === null
+      ? {
+          index: 0,
+          itemCount: 0,
+          itemCountIncompleteOnly: 0,
+          items: []
+        }
+      : JSON.parse(local);
   return {
     getFilter() {
-      return filters[state.filter];
+      return filters[props.filter];
     },
     setFilter(filterName) {
-      state.filter = filterName;
+      props.filter = filterName;
+      switch (filterName) {
+        case "COMPLETE":
+          window.location.hash = "#/filter/complete";
+          break;
+        case "INCOMPLETE":
+          window.location.hash = "#/filter/incomplete";
+          break;
+        default:
+          window.location.hash = "#/";
+          break;
+      }
+      // The 'filter' control is not part of the draw() loop
+      document.getElementById("filter").value = filterName;
       draw();
     },
     defaultItem() {
       return {
-        id: "todo" + ++index,
+        id: "todo" + state.index++,
         text: undefined,
         isDone: false,
         isEditing: false
@@ -92,6 +111,40 @@ const TodoList = (function() {
   };
 })();
 
+function init() {
+  const onHashChange = () => {
+    const hash = window.location.hash;
+    if (hash.startsWith("#/filter/complete")) {
+      TodoList.setFilter("COMPLETE");
+    } else if (hash.startsWith("#/filter/incomplete")) {
+      TodoList.setFilter("INCOMPLETE");
+    } else {
+      TodoList.setFilter("NONE");
+    }
+  };
+  onHashChange();
+  window.addEventListener("hashchange", onHashChange, false);
+
+  const filterEl = document.getElementById("filter");
+  filterEl.addEventListener("change", () => TodoList.setFilter(filterEl.value));
+
+  document
+    .getElementById("completeAll")
+    .addEventListener("click", () => TodoList.completeAll());
+  document.getElementById("submit").addEventListener("click", () => {
+    const inputEl = document.getElementById("field");
+    const text = inputEl.value;
+    if (text === "") {
+      return;
+    }
+    inputEl.value = "";
+
+    TodoList.add({
+      text: text
+    });
+  });
+}
+
 function draw() {
   const itemToDomNode = function(item) {
     const listEl = document.createElement("LI");
@@ -137,8 +190,13 @@ function draw() {
     return listEl;
   };
 
+  localStorage.setItem("much-todo", JSON.stringify(TodoList.getState()));
+
   const debugEl = document.getElementById("debug");
-  debugEl.textContent = JSON.stringify(TodoList.getState(), null, 2);
+  const queryParams = new URLSearchParams(window.location.search);
+  if (queryParams.has("debug")) {
+    debugEl.textContent = JSON.stringify(TodoList.getState(), null, 2);
+  }
 
   document.getElementById("count").innerText =
     "Item Count: " + TodoList.getState().itemCount;
@@ -154,23 +212,5 @@ function draw() {
     .map(item => list.appendChild(itemToDomNode(item)));
 }
 
-const filterEl = document.getElementById("filter");
-filterEl.addEventListener("change", () => TodoList.setFilter(filterEl.value));
-
-document
-  .getElementById("completeAll")
-  .addEventListener("click", () => TodoList.completeAll());
-document.getElementById("submit").addEventListener("click", () => {
-  const inputEl = document.getElementById("field");
-  const text = inputEl.value;
-  if (text === "") {
-    return;
-  }
-  inputEl.value = "";
-
-  TodoList.add({
-    text: text
-  });
-});
-
+init();
 draw();

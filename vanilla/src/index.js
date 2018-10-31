@@ -1,5 +1,17 @@
 import "./index.css";
 
+const Dom = {
+  byId(id) {
+    return document.getElementById(id);
+  },
+  createDiv() {
+    return document.createElement("DIV");
+  },
+  onBodyClick(handler) {
+    document.body.addEventListener("click", handler);
+  }
+};
+
 // TODO - possibly try to separate the draw() calls from this model object
 // Look into calls to .bind() for a higher order function
 const TodoList = (function() {
@@ -39,7 +51,7 @@ const TodoList = (function() {
           break;
       }
       // The 'filter' control is not part of the draw() loop
-      document.getElementById("filter").value = filterName;
+      Dom.byId("filter").value = filterName;
       draw();
     },
     defaultItem() {
@@ -116,32 +128,29 @@ const TodoList = (function() {
   };
 })();
 
+function onHashChange() {
+  const hash = window.location.hash;
+  if (hash.startsWith("#/filter/complete")) {
+    TodoList.setFilter("COMPLETE");
+  } else if (hash.startsWith("#/filter/incomplete")) {
+    TodoList.setFilter("INCOMPLETE");
+  } else {
+    TodoList.setFilter("NONE");
+  }
+}
+
 function init() {
-  const onHashChange = () => {
-    const hash = window.location.hash;
-    if (hash.startsWith("#/filter/complete")) {
-      TodoList.setFilter("COMPLETE");
-    } else if (hash.startsWith("#/filter/incomplete")) {
-      TodoList.setFilter("INCOMPLETE");
-    } else {
-      TodoList.setFilter("NONE");
-    }
-  };
   window.addEventListener("hashchange", onHashChange, false);
   onHashChange();
 
-  const filterEl = document.getElementById("filter");
+  const filterEl = Dom.byId("filter");
   filterEl.addEventListener("change", () => TodoList.setFilter(filterEl.value));
 
-  document
-    .getElementById("markAll")
-    .addEventListener("click", () => TodoList.markAll());
-  document
-    .getElementById("unmarkAll")
-    .addEventListener("click", () => TodoList.unmarkAll());
+  Dom.byId("markAll").addEventListener("click", () => TodoList.markAll());
+  Dom.byId("unmarkAll").addEventListener("click", () => TodoList.unmarkAll());
 
-  document.getElementById("submit").addEventListener("click", () => {
-    const inputEl = document.getElementById("field");
+  Dom.byId("submit").addEventListener("click", () => {
+    const inputEl = Dom.byId("field");
     const text = inputEl.value;
     if (text === "") {
       return;
@@ -154,71 +163,82 @@ function init() {
   });
 }
 
-function draw() {
-  const itemToDomNode = function(item) {
-    const listEl = document.createElement("LI");
-    listEl.setAttribute("id", item.id);
-
-    const checkEl = document.createElement("INPUT");
-    checkEl.setAttribute("type", "checkbox");
-    checkEl.addEventListener("click", () => TodoList.toggleComplete(item.id));
-    if (item.isDone) {
-      checkEl.checked = true;
+function itemClickHandler(item) {
+  return e => {
+    if (e.target.hasAttribute("done")) {
+      TodoList.toggleComplete(item.id);
+      return;
     }
-
-    var textEl;
-    if (item.isEditing) {
-      textEl = document.createElement("INPUT");
-      textEl.value = item.text;
-      textEl.addEventListener("click", e => e.stopPropagation());
-      document.body.addEventListener("click", () =>
-        TodoList.endEdit(item.id, textEl.value)
-      );
-    } else {
-      textEl = document.createElement("DIV");
-      textEl.textContent = item.text;
-      textEl.addEventListener("click", e => {
-        TodoList.startEdit(item.id);
-        e.stopPropagation();
-      });
+    if (e.target.hasAttribute("text") && e.target.nodeName === "INPUT") {
+      e.stopPropagation();
+      return;
     }
-
-    const delBtnEl = document.createElement("BUTTON");
-    delBtnEl.innerText = "X";
-    delBtnEl.addEventListener("click", () => TodoList.remove(item.id));
-
-    const wrapperDivEl = document.createElement("DIV");
-    wrapperDivEl.appendChild(checkEl);
-    wrapperDivEl.appendChild(textEl);
-    wrapperDivEl.appendChild(delBtnEl);
-
-    wrapperDivEl.setAttribute("class", "todo-item");
-
-    listEl.appendChild(wrapperDivEl);
-
-    return listEl;
+    if (e.target.hasAttribute("text") && e.target.nodeName === "DIV") {
+      TodoList.startEdit(item.id);
+      e.stopPropagation();
+      return;
+    }
+    if (e.target.hasAttribute("del")) {
+      TodoList.remove(item.id);
+      return;
+    }
   };
+}
 
-  localStorage.setItem("much-todo", JSON.stringify(TodoList.getState()));
+function itemToDomNode(item) {
+  if (item.isEditing) {
+    Dom.onBodyClick(() =>
+      // Can this handler be unregistered as part of the call? 
+      TodoList.endEdit(item.id, Dom.byId(item.id + "txt").value)
+    );
+  }
+  const itemContainer = Dom.createDiv();
+  itemContainer.addEventListener("click", itemClickHandler(item));
+  itemContainer.innerHTML = `
+    <li id="${item.id}">
+      <div class="todo-item">
+        <input done type="checkbox" ${item.isDone ? "checked" : ""}></input>
+        ${
+          item.isEditing
+            ? `<input text id="${item.id + "txt"}" value="${item.text}"/>`
+            : `<div text>${item.text}</div>`
+        }
+        <button del>X</button>
+      </div>
+    </li>
+  `;
+  return itemContainer;
+}
 
-  const debugEl = document.getElementById("debug");
+function drawDebugJson() {
+  const debugEl = Dom.byId("debug");
   const queryParams = new URLSearchParams(window.location.search);
   if (queryParams.has("debug")) {
     debugEl.textContent = JSON.stringify(TodoList.getState(), null, 2);
   }
+}
 
-  document.getElementById("count").innerText =
-    "Item Count: " + TodoList.getState().itemCount;
-  document.getElementById("incompleteCount").innerText =
+function drawCounts() {
+  Dom.byId("count").innerText = "Item Count: " + TodoList.getState().itemCount;
+  Dom.byId("incompleteCount").innerText =
     "Incomplete Item Count: " + TodoList.getState().itemCountIncompleteOnly;
+}
 
-  const list = document.getElementById("list");
+function drawTodos() {
+  const list = Dom.byId("list");
   while (list.firstChild) {
     list.removeChild(list.firstChild);
   }
   TodoList.getState()
     .items.filter(TodoList.getFilter())
     .map(item => list.appendChild(itemToDomNode(item)));
+}
+
+function draw() {
+  localStorage.setItem("much-todo", JSON.stringify(TodoList.getState()));
+  drawDebugJson();
+  drawCounts();
+  drawTodos();
 }
 
 init();

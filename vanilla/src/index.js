@@ -197,10 +197,15 @@ function itemClickHandler(item) {
 
 function itemToDomNode(item) {
   if (item.isEditing) {
-    Dom.onBodyClick(() =>
-      // Can this handler be unregistered as part of the call?
-      TodoList.endEdit(item.id, Dom.byId(item.id + "txt").value)
-    );
+    function clickAwayHandler() {
+      const el = Dom.byId(item.id + "txt");
+      if (el === null) {
+        return;
+      }
+      TodoList.endEdit(item.id, el.value);
+      document.removeEventListener("click", clickAwayHandler);
+    }
+    Dom.onBodyClick(clickAwayHandler);
   }
   const itemContainer = Dom.createDiv();
   itemContainer.addEventListener("click", itemClickHandler(item));

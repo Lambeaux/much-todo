@@ -13,21 +13,22 @@
     <div id="application">
         <div id="header">
             <h4>Much TODO (About Nothing)</h4>
-            <div id="count"></div>
-            <div id="incompleteCount"></div>
+            <div class="todo-metrics">
+                <div id="count"></div>
+                <div id="incompleteCount"></div>
+            </div>
         </div>
-        <div id="control">
-            <input type="text" id="field">
+        <span id="control" class="todo-actions">
+            <input type="text" id="field" placeholder="Enter something to do...">
             <button id="submit">Add</button>
             <button id="markAll">Mark All</button>
             <button id="unmarkAll">Unmark All</button>
-            <div>Filtering: </div>
             <select id="filter">
-                <option value="NONE">None</option>
-                <option value="COMPLETE">Complete</option>
-                <option value="INCOMPLETE">Incomplete</option>
+                <option value="NONE">Filter: None</option>
+                <option value="COMPLETE">Filter: Complete</option>
+                <option value="INCOMPLETE">Filter: Incomplete</option>
             </select>
-        </div>
+        </span>
         <ul class="todo-list" id="list">
         </ul>
 

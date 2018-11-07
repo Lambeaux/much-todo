@@ -1,4 +1,5 @@
 import "./index.css";
+import "./check.css";
 
 const Dom = {
   byId(id) {
@@ -9,6 +10,14 @@ const Dom = {
   },
   onBodyClick(handler) {
     document.body.addEventListener("click", handler);
+  },
+  highlightInput() {
+    const el = document.querySelector("input.todo-text");
+    if (el === null) {
+      return;
+    }
+    el.focus();
+    el.setSelectionRange(0, el.value.length);
   }
 };
 
@@ -165,20 +174,21 @@ function init() {
 
 function itemClickHandler(item) {
   return e => {
-    if (e.target.hasAttribute("done")) {
+    const el = e.target;
+    if (el.hasAttribute("done")) {
       TodoList.toggleComplete(item.id);
       return;
     }
-    if (e.target.hasAttribute("text") && e.target.nodeName === "INPUT") {
+    if (el.hasAttribute("text") && el.nodeName === "INPUT") {
       e.stopPropagation();
       return;
     }
-    if (e.target.hasAttribute("text") && e.target.nodeName === "DIV") {
+    if (el.hasAttribute("text") && el.nodeName === "DIV") {
       TodoList.startEdit(item.id);
       e.stopPropagation();
       return;
     }
-    if (e.target.hasAttribute("del")) {
+    if (el.hasAttribute("del")) {
       TodoList.remove(item.id);
       return;
     }
@@ -188,7 +198,7 @@ function itemClickHandler(item) {
 function itemToDomNode(item) {
   if (item.isEditing) {
     Dom.onBodyClick(() =>
-      // Can this handler be unregistered as part of the call? 
+      // Can this handler be unregistered as part of the call?
       TodoList.endEdit(item.id, Dom.byId(item.id + "txt").value)
     );
   }
@@ -197,13 +207,17 @@ function itemToDomNode(item) {
   itemContainer.innerHTML = `
     <li id="${item.id}">
       <div class="todo-item">
-        <input done type="checkbox" ${item.isDone ? "checked" : ""}></input>
+        <button del>X</button>
+        <label class="check-container">
+          <input done type="checkbox" ${item.isDone ? "checked" : ""}></input>
+          <span class="check-mark"></span>
+        </label>
         ${
           item.isEditing
-            ? `<input text id="${item.id + "txt"}" value="${item.text}"/>`
-            : `<div text>${item.text}</div>`
+            ? `<input text class="todo-text" type="text" id="${item.id +
+                "txt"}" value="${item.text}"/>`
+            : `<div text class="todo-text">${item.text}</div>`
         }
-        <button del>X</button>
       </div>
     </li>
   `;
@@ -221,7 +235,7 @@ function drawDebugJson() {
 function drawCounts() {
   Dom.byId("count").innerText = "Item Count: " + TodoList.getState().itemCount;
   Dom.byId("incompleteCount").innerText =
-    "Incomplete Item Count: " + TodoList.getState().itemCountIncompleteOnly;
+    "Incomplete: " + TodoList.getState().itemCountIncompleteOnly;
 }
 
 function drawTodos() {
@@ -239,6 +253,8 @@ function draw() {
   drawDebugJson();
   drawCounts();
   drawTodos();
+
+  Dom.highlightInput();
 }
 
 init();

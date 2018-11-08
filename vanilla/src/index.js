@@ -11,6 +11,9 @@ const Dom = {
   onBodyClick(handler) {
     document.body.addEventListener("click", handler);
   },
+  removeClick(handler) {
+    document.removeEventListener("click", handler);
+  },
   highlightInput() {
     const el = document.querySelector("input.todo-text");
     if (el === null) {
@@ -30,7 +33,8 @@ const TodoList = (function() {
     INCOMPLETE: item => item.isDone === false
   };
   const props = {
-    filter: "NONE"
+    filter: "NONE",
+    keyToggles: new Map([[13, false]])
   };
   const local = localStorage.getItem("much-todo");
   const state =
@@ -43,6 +47,19 @@ const TodoList = (function() {
         }
       : JSON.parse(local);
   return {
+    getKeyToggle(code) {
+      if (props.keyToggles.has(code)) {
+        return props.keyToggles.get(code);
+      }
+      throw "[" + code + "] is not an initialized key toggle";
+    },
+    toggleKey(code) {
+      if (props.keyToggles.has(code)) {
+        props.keyToggles.set(code, !props.keyToggles.get(code));
+        return;
+      }
+      throw "[" + code + "] is not an initialized key toggle";
+    },
     getFilter() {
       return filters[props.filter];
     },
@@ -148,6 +165,19 @@ function onHashChange() {
   }
 }
 
+function handleSubmitTodo() {
+  const inputEl = Dom.byId("field");
+  const text = inputEl.value;
+  if (text === "") {
+    return;
+  }
+  inputEl.value = "";
+
+  TodoList.add({
+    text: text
+  });
+}
+
 function init() {
   window.addEventListener("hashchange", onHashChange, false);
   onHashChange();
@@ -158,17 +188,17 @@ function init() {
   Dom.byId("markAll").addEventListener("click", () => TodoList.markAll());
   Dom.byId("unmarkAll").addEventListener("click", () => TodoList.unmarkAll());
 
-  Dom.byId("submit").addEventListener("click", () => {
-    const inputEl = Dom.byId("field");
-    const text = inputEl.value;
-    if (text === "") {
-      return;
+  Dom.byId("submit").addEventListener("click", handleSubmitTodo);
+  Dom.byId("field").addEventListener("keyup", e => {
+    if (e.keyCode === 13 && TodoList.getKeyToggle(13) === true) {
+      TodoList.toggleKey(13);
     }
-    inputEl.value = "";
-
-    TodoList.add({
-      text: text
-    });
+  });
+  Dom.byId("field").addEventListener("keydown", e => {
+    if (e.keyCode === 13 && TodoList.getKeyToggle(13) === false) {
+      handleSubmitTodo();
+      TodoList.toggleKey(13);
+    }
   });
 }
 
@@ -203,7 +233,7 @@ function itemToDomNode(item) {
         return;
       }
       TodoList.endEdit(item.id, el.value);
-      document.removeEventListener("click", clickAwayHandler);
+      Dom.removeClick(clickAwayHandler);
     }
     Dom.onBodyClick(clickAwayHandler);
   }

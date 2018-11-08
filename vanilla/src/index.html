@@ -1,42 +1,34 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-    <title>
-        <%= htmlWebpackPlugin.options.title %>
-    </title>
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
 
-</head>
-
-<body>
+  <body>
     <div id="application">
-        <div id="header">
-            <h4>Much TODO (About Nothing)</h4>
-            <div class="todo-metrics">
-                <div id="count"></div>
-                <div id="incompleteCount"></div>
-            </div>
+      <div id="header">
+        <h4>Much TODO (About Nothing)</h4>
+        <div class="todo-metrics">
+          <div id="count"></div>
+          <div id="incompleteCount"></div>
         </div>
-        <span id="control" class="todo-actions">
-            <input type="text" id="field" placeholder="Enter something to do...">
-            <button id="submit">Add</button>
-            <button id="markAll">Mark All</button>
-            <button id="unmarkAll">Unmark All</button>
-            <select id="filter">
-                <option value="NONE">Filter: None</option>
-                <option value="COMPLETE">Filter: Complete</option>
-                <option value="INCOMPLETE">Filter: Incomplete</option>
-            </select>
-        </span>
-        <ul class="todo-list" id="list">
-        </ul>
+      </div>
+      <span id="control" class="todo-actions">
+        <input id="field" type="text" placeholder="Enter something to do..." />
+        <button id="submit">Add</button> <button id="markAll">Mark All</button>
+        <button id="unmarkAll">Unmark All</button>
+        <select id="filter">
+          <option value="NONE">Filter: None</option>
+          <option value="COMPLETE">Filter: Complete</option>
+          <option value="INCOMPLETE">Filter: Incomplete</option>
+        </select>
+      </span>
+      <ul class="todo-list" id="list"></ul>
 
-        <hr />
+      <hr />
 
-        <pre id="debug"></pre>
-
+      <pre id="debug"></pre>
     </div>
-</body>
-
+  </body>
 </html>
